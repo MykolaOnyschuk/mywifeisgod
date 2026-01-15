@@ -183,12 +183,115 @@
             animation: heartbeat 1s ease-in-out infinite;
         }
 
+        .big-heart .secret-heart {
+            cursor: pointer;
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+
+        .big-heart .secret-heart:hover {
+            transform: scale(1.3);
+        }
+
         @keyframes heartbeat {
             0%, 100% { transform: scale(1); }
             25% { transform: scale(1.1); }
             35% { transform: scale(1); }
             45% { transform: scale(1.15); }
             55% { transform: scale(1); }
+        }
+
+        /* Secret romantic popup */
+        .love-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .love-popup.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .love-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            animation: popup-appear 0.5s ease;
+        }
+
+        @keyframes popup-appear {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .love-content .big-love {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: love-pulse 0.5s ease infinite;
+        }
+
+        @keyframes love-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .love-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            color: #ff69b4;
+            margin-bottom: 20px;
+        }
+
+        .love-content p {
+            font-size: 20px;
+            color: #ffb6c1;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .love-content .close-btn {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            border: none;
+            color: #fff;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .love-content .close-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+        }
+
+        /* Heart explosion effect */
+        .heart-explosion {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .exploding-heart {
+            position: absolute;
+            font-size: 30px;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
         }
 
         .footer-text {
@@ -237,8 +340,22 @@
 
 
         
-        <div class="big-heart">💗💗💗</div>
+        <div class="big-heart">💗<span class="secret-heart" onclick="showLove()">💗</span>💗</div>
         
+    </div>
+
+    <!-- Secret Love Popup -->
+    <div class="love-popup" id="lovePopup" onclick="hideLove(event)">
+        <div class="love-content" onclick="event.stopPropagation()">
+            <div class="big-love">💖</div>
+            <h2>You Found The Secret!</h2>
+            <p>
+                Like I found you that one day by at the beach<br><br>
+                I love you more than anything.<br>
+                You are my today and forever. 💕
+            </p>
+            <button class="close-btn" onclick="hideLove(event)">I Love You Too! 💋</button>
+        </div>
     </div>
 
     <script>
@@ -266,6 +383,49 @@
         // Create initial batch
         for (let i = 0; i < 15; i++) {
             setTimeout(createHeart, i * 200);
+        }
+
+        // Secret heart functions
+        function showLove() {
+            // Create heart explosion at click position
+            createHeartExplosion();
+            
+            // Show popup after explosion
+            setTimeout(() => {
+                document.getElementById('lovePopup').classList.add('show');
+            }, 300);
+        }
+
+        function hideLove(event) {
+            document.getElementById('lovePopup').classList.remove('show');
+        }
+
+        function createHeartExplosion() {
+            const container = document.createElement('div');
+            container.className = 'heart-explosion';
+            container.style.left = '50%';
+            container.style.top = '50%';
+            document.body.appendChild(container);
+
+            const hearts = ['💕', '💖', '💗', '💓', '💝', '❤️', '💘', '💞', '✨', '💫'];
+            
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'exploding-heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                
+                const angle = (i / 20) * 360;
+                const distance = 100 + Math.random() * 150;
+                const tx = Math.cos(angle * Math.PI / 180) * distance;
+                const ty = Math.sin(angle * Math.PI / 180) * distance;
+                
+                heart.style.setProperty('--tx', tx + 'px');
+                heart.style.setProperty('--ty', ty + 'px');
+                
+                container.appendChild(heart);
+            }
+
+            setTimeout(() => container.remove(), 1000);
         }
     </script>
 </body>
